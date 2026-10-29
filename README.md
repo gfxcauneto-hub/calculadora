@@ -37,7 +37,7 @@ Calculadora e Simulador de Precificação Multicanal de Inteligência para E-com
 5. **Demais Canais Mantidos:**
    - **Mercado Livre Clássico e Premium:** Com regras de peso para `< R$ 79` e frete grátis para `≥ R$ 79`.
    - **Shopee:** Tabela de comissão por faixas (até 79,99, 80–99, 100–199, ≥ 200) e taxa de CPF.
-   - **TikTok Shop:** Comissões oficiais (< 50 e ≥ 50), taxa fixa por item e programa de frete grátis 6%.
+   - **TikTok Shop:** Comissões oficiais (< 50 e ≥ 50), opção de **Comissão Zerada (2 meses iniciais)**, taxa fixa por item e programa de frete grátis 6%.
 
 6. **Relatório PDF Executivo (1 página A4):**
    - Logotipo oficial da **6m Strategy**.

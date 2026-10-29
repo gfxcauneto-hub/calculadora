@@ -563,8 +563,8 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top:
             <tr><td></td><td>80–99,99</td><td>14% + R$ 16,00 taxa fixa</td></tr>
             <tr><td></td><td>100–199,99</td><td>14% + R$ 20,00 taxa fixa</td></tr>
             <tr><td></td><td>≥ 200</td><td>14% + R$ 26,00 taxa fixa · CPF +R$ 3 se &gt;450 pedidos/90d</td></tr>
-            <tr><td>TikTok Shop</td><td>&lt; R$ 50</td><td>10% + R$ 4,00 taxa fixa</td></tr>
-            <tr><td></td><td>≥ R$ 50</td><td>6% + R$ 6,00 taxa fixa · Frete grátis +6% (teto R$ 50)</td></tr>
+            <tr><td>TikTok Shop</td><td>&lt; R$ 50</td><td>10% (ou 0% nos 2 meses iniciais) + R$ 4,00 taxa fixa</td></tr>
+            <tr><td></td><td>≥ R$ 50</td><td>6% (ou 0% nos 2 meses iniciais) + R$ 6,00 taxa fixa · Frete grátis +6% (teto R$ 50)</td></tr>
             <tr><td>Amazon Brasil</td><td>Qualquer</td><td>Comissão por categoria (10% a 15% · mínimo R$ 1,00)</td></tr>
             <tr><td></td><td>Plano</td><td>Profissional: R$ 0/item · Individual: +R$ 2,00 por item vendido</td></tr>
             <tr><td></td><td>Logística DBA</td><td>&lt; 30: R$ 4,50 · &lt; 50: R$ 6,50 · &lt; 79: R$ 6,75 · ≥ 79: R$ 12,85 a 20,45</td></tr>
@@ -691,7 +691,7 @@ const cfg = {
   mlc: { pct: 12, envio: 'full', manual: 0, frete: 25 },
   mlp: { pct: 17, envio: 'full', manual: 0, frete: 25 },
   shp: { cpf: false, extra: 0 },
-  tik: { freteProg: true, afil: 0 },
+  tik: { comZero: false, freteProg: true, afil: 0 },
   amz: { category: 'shoes-bags-and-sunglasses', plan: 'professional', shipping: true, freteManual: 0 }
 };
 
@@ -776,8 +776,8 @@ function fees(key, P, I){
   }
 
   if(key==='tik'){
-    const lo = P<50; const p = lo?.10:.06, f = lo?4:6;
-    L.push({k:'com', label:'Comissão TikTok Shop', note:pct(P>0?p:0,0), v:P*(P>0?p:0)});
+    const lo = P<50; const p = c.comZero ? 0 : (lo ? .10 : .06), f = lo ? 4 : 6;
+    L.push({k:'com', label:'Comissão TikTok Shop', note: c.comZero ? '0% (isento 2 meses)' : pct(P>0?p:0,0), v:P*(P>0?p:0)});
     if(P > 0) L.push({k:'fix', label:'Taxa fixa por item', note:'por item', v:f});
     if(c.freteProg && P > 0) L.push({k:'frt', label:'Programa frete grátis', note:'6% · teto R$ 50', v:Math.min(P*.06,50)});
     if(c.afil>0 && P > 0) L.push({k:'afi', label:'Comissão de afiliado', note:pct(c.afil/100,0), v:P*c.afil/100});
@@ -874,6 +874,7 @@ function cfgHTML(key){
     <div class="field"><label>Frete/outros cobrados pela Shopee</label><div class="inp"><span>R$</span><input data-k="shp" data-f="extra" inputmode="decimal" value="${fmtIn(c.extra)}"></div></div>`;
 
   if(key==='tik') return `
+    <label class="toggle">Comissão zerada (2 meses iniciais)<input type="checkbox" data-k="tik" data-f="comZero" ${c.comZero?'checked':''}><span class="sw"></span></label>
     <label class="toggle">Programa de frete grátis (6%)<input type="checkbox" data-k="tik" data-f="freteProg" ${c.freteProg?'checked':''}><span class="sw"></span></label>
     <div class="field"><label>Comissão de afiliado</label><div class="inp"><input data-k="tik" data-f="afil" inputmode="decimal" value="${String(c.afil).replace('.',',')}"><span class="suf">%</span></div></div>`;
 
@@ -1115,7 +1116,7 @@ function reportHTML(){
     const c=cfg[k];
     if(k==='mlc'||k==='mlp') return `Cat. ${pct(c.pct/100,1)} · ${I.preco<79?(c.envio==='full'?'Full/Coleta':c.envio==='flex'?'Flex/próprio':'manual'):'frete '+brl(c.frete)}`;
     if(k==='shp') return c.cpf?'Vendedor CPF':'Vendedor CNPJ';
-    if(k==='tik') return `${c.freteProg?'Com':'Sem'} frete grátis${c.afil>0?' · afil. '+pct(c.afil/100,0):''}`;
+    if(k==='tik') return `${c.comZero?'Comissão 0% (2m) · ':''}${c.freteProg?'Com':'Sem'} frete grátis${c.afil>0?' · afil. '+pct(c.afil/100,0):''}`;
     if(k==='amz') return `Amazon ${c.plan==='individual'?'Individual':'Profissional'} · ${c.shipping?'DBA':'Frete próprio'}`;
   };
   const stCol = m => m<0?['#FEF2F2','#DC2626']:m<.10?['#FFFBEB','#D97706']:m<.20?['#EFF6FF','#2563EB']:['#ECFDF5','#059669'];
